@@ -13,16 +13,11 @@ const db = mysql.createConnection({
 },
 console.log('connected to database')
 )
-// db.connect((err) => {
-//     if (err) throw err;
-//     // execute main function
-//     console.log('Connected!');
-//     const sql = `SELECT e1.id, e1.first_name, e1.last_name, role.title, department.name AS department, role.salary, CONCAT(e2.first_name, ' ', e2.last_name) AS manager FROM employee e1 JOIN role ON e1.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee e2 ON e2.id= e1.manager_id`
-//     db.query(sql, (err, result, ) => {
-//         if (err) throw err;
-//         console.log(result);
-//     });
-// });
+db.connect((err) => {
+    if (err) throw err;
+    // execute main function
+    console.log('Connected!');
+});
 
 const main = [
         {
@@ -73,32 +68,38 @@ const aEmployee =[
         },
         {
             type: 'list',
-            name: 'role',
-            message: 'What is the employees role?',
-            choices: ['Salesperson', 'Lead Engineer', 'Software Engineer', 'Account Manager', 'Accountant', 'Legal Team Lead']
+            name: 'roleId',
+            message: 'What is id of the employees role?',
+            choices: ['1','2','3','4','5','6','7','8']
         },
         {
             type: 'list',
-            name: 'manager',
-            message: 'Who is the employees manager?',
-            choices: ['John Doe', 'Mike Chan', 'Ashley Rodriguez', 'Kevin Tupik', 'Kunal Singh', ' Malia Brown']
+            name: 'managerId',
+            message: 'What is the id of the employees manager?',
+            choices: ['1','2','3','4','5','6','7','8']
         },
     ]
 
 const uRole = [
         {
             type: 'list',
-            name: 'update',
+            name: 'employee',
             message: 'What employees role do you want to update?',
             choices: ['Ashley Rodriguez', 'Kevin Tupik',
         'Kunal Singh', 'Malia Brown', 'Sarah Lourd', 'Tom Allen']
+        },
+        {
+            type: 'list',
+            name: 'roleId',
+            message: 'What is the role id that you would like to update the employee to?',
+            choices: ['1','2','3','4','5','6','7','8']
         }
     ]
 
 const aRole = [
         {
             type: 'input',
-            name: 'role name',
+            name: 'role_name',
             message: 'What is the name of the role?'
         },
         {
@@ -108,21 +109,21 @@ const aRole = [
         },
         {
             type: 'list',
-            name: 'department',
-            message: 'Which department does the role belong to?',
-            choices: ['Engineering', 'Finance', 'Legal', 'Sales']
+            name: 'departmentId',
+            message: 'What is the id of the department that the role belongs to?',
+            choices: ['1','2','3','4']
         },
     ];
 
 const aDepartment = [
         {
             type: 'input',
-            name: 'depart name',
+            name: 'depart_name',
             message: 'What is the name of the department?'
         }
     ]
 
-    const q = () => {
+const q = () => {
         return inquirer.prompt(main)
         .then((data) =>{
             switch(data.choice){
@@ -139,12 +140,20 @@ const aDepartment = [
                     addDepartment();
                     break;
                 // View employee
-                case 'View Employees':
-                    db.query(`SELECT e1.id, e1.first_name, e1.last_name, role.title, department.name AS department, role.salary, CONCAT(e2.first_name, ' ', e2.last_name) AS manager FROM employee e1 JOIN role ON e1.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee e2 ON e2.id= e1.manager_id`);
-                    console.table(results[0]);
-                    q();
+                case 'View All Employees':
+                    db.query(`SELECT e1.id, e1.first_name, e1.last_name, role.title, department.name AS department, role.salary, CONCAT(e2.first_name, ' ', e2.last_name) AS manager FROM employee e1 JOIN role ON e1.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee e2 ON e2.id= e1.manager_id`, (err, results) =>{
+                        if(err){
+                            console.error(err);
+                        } else {
+                            console.table(results); 
+                        } 
+                        setTimeout(() => {
+                            q(); 
+                        }, 1000); //wait for 1 sec before calling q()
+                       
+                    });
                     break;
-                case 'View Roles':
+                case 'View All Roles':
                     db.query(`SELECT * FROM role`, ((err,results) => {
                         if(err){
                             console.log(err);
@@ -154,7 +163,7 @@ const aDepartment = [
                         }
                     }));
                     break;
-                case 'View Departments':
+                case 'View All Departments':
                     db.query(`SELECT * FROM department`, ((err, results) => {
                         if(err){
                             console.log(err);
@@ -172,7 +181,50 @@ const aDepartment = [
         return inquirer
         .prompt(aEmployee).then((data) => {
             db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${data.first}', '${data.last}', '${data.role}', '${data.manager}')`, (err, results)=> {
-             console.log(`You successfully added ${data.first} ${data.last}`)
+                if(err){
+                    console.log(err);
+                } else {
+                    console.log(`You successfully added ${data.first} ${data.last}`)
+                }
+            });
+            q();
+        });
+    };
+    const addRole = () => {
+        return inquirer
+        .prompt(aRole).then((data) => {
+            db.query(`INSERT INTO role (title, salary, department_id) VALUES ('${data.role_name}', '${data.salary}', '${data.department}')`, (err, results)=> {
+                if(err){
+                    console.log(err);
+                } else {
+                    console.log(`${data.first} ${data.last} role was successfully updated to ${data.title}`)
+                }
+            });
+            q();
+        });
+    };
+    const updateRole = () => {
+        return inquirer
+        .prompt(uRole).then((data) => {
+            db.query(`INSERT INTO role (title, salary, department_id) VALUES (${data.first},${data.last},'${data.name}')`, (err, results)=> {
+                if(err){
+                    console.log(err);
+                } else {
+                    console.log(`${data.first} ${data.last} role was successfully updated to ${data.title}`)
+                }
+            });
+            q();
+        });
+    };
+    const addDepartment = () => {
+        return inquirer
+        .prompt(aDepartment).then((data) => {
+            db.query(`INSERT INTO department (name) VALUES ('${data.depart_name}')`, (err, results)=> {
+                if(err){
+                    console.log(err);
+                } else {
+                    console.log(`You successfully added ${data.name}`)
+                }
             });
             q();
         });
