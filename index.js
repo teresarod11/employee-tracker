@@ -81,20 +81,17 @@ const aEmployee =[
     ]
 
 const uRole = [
+           {
+            type: 'input',
+            name: 'role',
+            message: 'What role would you like to update the employee to?'
+        }, 
         {
-            type: 'list',
-            name: 'employee',
-            message: 'What employees role do you want to update?',
-            choices: ['Ashley Rodriguez', 'Kevin Tupik',
-        'Kunal Singh', 'Malia Brown', 'Sarah Lourd', 'Tom Allen']
+            type: 'input',
+            name: 'id',
+            message: 'What is the employees id that you want to update?'
         },
-        {
-            type: 'list',
-            name: 'roleId',
-            message: 'What is the role id that you would like to update the employee to?',
-            choices: ['1','2','3','4','5','6','7','8']
-        }
-    ]
+    ];
 
 const aRole = [
         {
@@ -180,7 +177,7 @@ const q = () => {
     const addEmployee = () => {
         return inquirer
         .prompt(aEmployee).then((data) => {
-            db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${data.first}', '${data.last}', '${data.role}', '${data.manager}')`, (err, results)=> {
+            db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${data.first}', '${data.last}', '${data.roleId}', '${data.managerId}')`, (err, results)=> {
                 if(err){
                     console.log(err);
                 } else {
@@ -193,7 +190,7 @@ const q = () => {
     const addRole = () => {
         return inquirer
         .prompt(aRole).then((data) => {
-            db.query(`INSERT INTO role (title, salary, department_id) VALUES ('${data.role_name}', '${data.salary}', '${data.department}')`, (err, results)=> {
+            db.query(`INSERT INTO role (title, salary, department_id) VALUES ('${data.role_name}', '${data.salary}', '${data.departmentId}')`, (err, results)=> {
                 if(err){
                     console.log(err);
                 } else {
@@ -206,11 +203,11 @@ const q = () => {
     const updateRole = () => {
         return inquirer
         .prompt(uRole).then((data) => {
-            db.query(`INSERT INTO role (title, salary, department_id) VALUES (${data.first},${data.last},'${data.name}')`, (err, results)=> {
+            db.query(`INSERT INTO role (id, title) VALUES (${data.id},'${data.role}')`, (err, results)=> {
                 if(err){
                     console.log(err);
                 } else {
-                    console.log(`${data.first} ${data.last} role was successfully updated to ${data.title}`)
+                    console.log(`${data.id} role was successfully updated to ${data.role}`) 
                 }
             });
             q();
