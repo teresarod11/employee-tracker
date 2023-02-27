@@ -1,6 +1,6 @@
 # employee-tracker
  ## Description
-  
+  This is a employee tracker using inquirer and mysql that allows you to view all of the employees, add employees, update employees information, view all roles, add a role, view departments, and add departments.
   ## Video Link
   https://drive.google.com/file/d/1rX1Qz_CSIPr5Ln11RyfPJZ4TV_QPu43M/view
   ## Questions
